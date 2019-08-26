@@ -37,6 +37,7 @@ func main() {
 	// irc.AddTrigger(LongTrigger)
 	irc.AddTrigger(QuitTrigger)
 	irc.AddTrigger(WeatherTrigger)
+	irc.AddTrigger(WeatherTrigger2)
 	irc.Logger.SetHandler(log.StdoutHandler)
 	// logHandler := log.LvlFilterHandler(log.LvlInfo, log.StdoutHandler)
 	// or
@@ -94,6 +95,17 @@ var WeatherTrigger = hbot.Trigger{
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!sää ")))
+		return false
+	},
+}
+
+// WeatherTrigger2 check weather
+var WeatherTrigger2 = hbot.Trigger{
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!fmi ")
+	},
+	func(irc *hbot.Bot, m *hbot.Message) bool {
+		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!fmi ")))
 		return false
 	},
 }

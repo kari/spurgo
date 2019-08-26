@@ -1,0 +1,1 @@
+nohup ./spurgo-linux > /dev/null 2>&1 &
