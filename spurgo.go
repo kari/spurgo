@@ -6,15 +6,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/kari/fmi"
+	urldescribe "github.com/kari/urldescribe"
 	hbot "github.com/whyrusleeping/hellabot"
 	log "gopkg.in/inconshreveable/log15.v2"
 )
 
 // var serv = flag.String("server", "irc.quakenet.org:6667", "hostname and port for irc server to connect to")
+
 var serv = flag.String("server", "chat.freenode.net:6667", "hostname and port for irc server to connect to")
 
 var nick = flag.String("nick", "spurgo", "nickname for the bot")
@@ -26,7 +29,9 @@ func main() {
 		bot.HijackSession = true
 	}
 	channels := func(bot *hbot.Bot) {
+		// bot.Channels = []string{"#spurgo"}
 		bot.Channels = []string{"#reddit-suomi"}
+
 	}
 	irc, err := hbot.NewBot(*serv, *nick, hijackSession, channels)
 	if err != nil {
@@ -38,6 +43,7 @@ func main() {
 	irc.AddTrigger(QuitTrigger)
 	irc.AddTrigger(WeatherTrigger)
 	irc.AddTrigger(WeatherTrigger2)
+	irc.AddTrigger(URLTrigger)
 	irc.Logger.SetHandler(log.StdoutHandler)
 	// logHandler := log.LvlFilterHandler(log.LvlInfo, log.StdoutHandler)
 	// or
@@ -106,6 +112,18 @@ var WeatherTrigger2 = hbot.Trigger{
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!fmi ")))
+		return false
+	},
+}
+
+// URLTrigger attempts to describe the link
+var URLTrigger = hbot.Trigger{
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		re := regexp.MustCompile("https?:\\/\\/[^\\ ]+")
+		return m.Command == "PRIVMSG" && re.MatchString(m.Content)
+	},
+	func(irc *hbot.Bot, m *hbot.Message) bool {
+		irc.Reply(m, urldescribe.DescribeURL(m.Content))
 		return false
 	},
 }
