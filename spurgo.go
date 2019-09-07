@@ -16,11 +16,9 @@ import (
 	log "gopkg.in/inconshreveable/log15.v2"
 )
 
-// var serv = flag.String("server", "irc.quakenet.org:6667", "hostname and port for irc server to connect to")
-
-var serv = flag.String("server", "chat.freenode.net:6667", "hostname and port for irc server to connect to")
-
+var serv = flag.String("server", "irc.quakenet.org:6667", "hostname and port for irc server to connect to")
 var nick = flag.String("nick", "spurgo", "nickname for the bot")
+var chans = flag.String("chans", "#spurgo", "channels to join")
 
 func main() {
 	flag.Parse()
@@ -29,8 +27,7 @@ func main() {
 		bot.HijackSession = true
 	}
 	channels := func(bot *hbot.Bot) {
-		// bot.Channels = []string{"#spurgo"}
-		bot.Channels = []string{"#reddit-suomi"}
+		bot.Channels = strings.Split(*chans, ",")
 
 	}
 	irc, err := hbot.NewBot(*serv, *nick, hijackSession, channels)
@@ -41,6 +38,7 @@ func main() {
 	irc.AddTrigger(SayInfoMessage)
 	// irc.AddTrigger(LongTrigger)
 	irc.AddTrigger(QuitTrigger)
+	irc.AddTrigger(OpTrigger)
 	irc.AddTrigger(WeatherTrigger)
 	irc.AddTrigger(WeatherTrigger2)
 	irc.AddTrigger(URLTrigger)
@@ -91,6 +89,18 @@ var QuitTrigger = hbot.Trigger{
 		irc.Send("QUIT :Time to die.")
 
 		return true
+	},
+}
+
+// OpTrigger makes the bot op the owner
+var OpTrigger = hbot.Trigger{
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		return m.Command == "PRIVMSG" && m.To == bot.Nick && strings.HasPrefix(m.Content, "!op ") && m.From == "zyx"
+	},
+	func(irc *hbot.Bot, m *hbot.Message) bool {
+		irc.ChMode("zyx", strings.TrimPrefix(m.Content, "!op "), "+o")
+
+		return false
 	},
 }
 
