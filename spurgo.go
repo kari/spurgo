@@ -133,7 +133,8 @@ var URLTrigger = hbot.Trigger{
 		return m.Command == "PRIVMSG" && re.MatchString(m.Content)
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
-		irc.Reply(m, urldescribe.DescribeURL(m.Content))
+		re := regexp.MustCompile("https?:\\/\\/[^\\ ]+")
+		irc.Reply(m, urldescribe.DescribeURL(re.FindString(m.Content)))
 		return false
 	},
 }
