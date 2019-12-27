@@ -1,6 +1,3 @@
-// This is an example program showing the usage of hellabot
-// kts myös https://github.com/go-chat-bot/bot
-
 package main
 
 import (
@@ -8,7 +5,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/kari/fmi"
 	urldescribe "github.com/kari/urldescribe"
@@ -36,18 +32,13 @@ func main() {
 	}
 
 	irc.AddTrigger(SayInfoMessage)
-	// irc.AddTrigger(LongTrigger)
 	irc.AddTrigger(QuitTrigger)
 	irc.AddTrigger(OpTrigger)
 	irc.AddTrigger(WeatherTrigger)
 	irc.AddTrigger(WeatherTrigger2)
 	irc.AddTrigger(URLTrigger)
+	irc.AddTrigger(WrongBotTrigger)
 	irc.Logger.SetHandler(log.StdoutHandler)
-	// logHandler := log.LvlFilterHandler(log.LvlInfo, log.StdoutHandler)
-	// or
-	// irc.Logger.SetHandler(logHandler)
-	// or
-	// irc.Logger.SetHandler(log.StreamHandler(os.Stdout, log.JsonFormat()))
 
 	// Start up bot (this blocks until we disconnect)
 	irc.Run()
@@ -60,22 +51,8 @@ var SayInfoMessage = hbot.Trigger{
 		return m.Command == "PRIVMSG" && m.Content == "!info"
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
-		irc.Reply(m, fmt.Sprintf("Hello, I am %s", irc.Nick))
-		return false
-	},
-}
-
-// LongTrigger sends two messages with 5 second delay
-var LongTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
-		return m.Command == "PRIVMSG" && m.Content == "!long"
-	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
-		irc.Reply(m, "This is the first message")
-		time.Sleep(5 * time.Second)
-		irc.Reply(m, "This is the second message")
-
-		return false
+		irc.Reply(m, fmt.Sprintf("Hei, olen %s. Kysy minulta vaikka säätä: !sää helsinki", irc.Nick))
+		return true
 	},
 }
 
@@ -100,7 +77,7 @@ var OpTrigger = hbot.Trigger{
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.ChMode("zyx", strings.TrimPrefix(m.Content, "!op "), "+o")
 
-		return false
+		return true
 	},
 }
 
@@ -111,7 +88,7 @@ var WeatherTrigger = hbot.Trigger{
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!sää ")))
-		return false
+		return true
 	},
 }
 
@@ -122,7 +99,18 @@ var WeatherTrigger2 = hbot.Trigger{
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!fmi ")))
-		return false
+		return true
+	},
+}
+
+// WrongBotTrigger redirects to correct bot
+var WrongBotTrigger = hbot.Trigger{
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!")
+	},
+	func(irc *hbot.Bot, m *hbot.Message) bool {
+		irc.Reply(m, "Tarkoititko ."+strings.TrimPrefix(m.Content, "!")+"?")
+		return true
 	},
 }
 
@@ -135,6 +123,6 @@ var URLTrigger = hbot.Trigger{
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		re := regexp.MustCompile("https?:\\/\\/[^\\ ]+")
 		irc.Reply(m, urldescribe.DescribeURL(re.FindString(m.Content)))
-		return false
+		return true
 	},
 }
