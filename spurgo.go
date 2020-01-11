@@ -37,6 +37,8 @@ func main() {
 	irc.AddTrigger(WeatherTrigger)
 	irc.AddTrigger(WeatherTrigger2)
 	irc.AddTrigger(URLTrigger)
+	irc.AddTrigger(SimileTrigger)
+	// WrongBotTrigger needs to be last
 	irc.AddTrigger(WrongBotTrigger)
 	irc.Logger.SetHandler(log.StdoutHandler)
 
@@ -99,6 +101,17 @@ var WeatherTrigger2 = hbot.Trigger{
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!fmi ")))
+		return true
+	},
+}
+
+// SimileTrigger fetches a simile
+var SimileTrigger = hbot.Trigger{
+	func(bot *hbot.Bot, m *hbot.Message) bool {
+		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!vertaus")
+	},
+	func(irc *hbot.Bot, m *hbot.Message) bool {
+		irc.Reply(m, sample("", strings.TrimSpace(strings.TrimPrefix(m.Content, "!vertaus"))))
 		return true
 	},
 }
