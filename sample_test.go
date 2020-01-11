@@ -20,4 +20,5 @@ func TestSampleSearch(t *testing.T) {
 		t.Errorf("sample does not contain substring")
 	}
 	t.Log(s)
+	s = sample("", "Vantaa") // vantaasta ei ole vertauskuvia
 }
