@@ -119,7 +119,8 @@ var SimileTrigger = hbot.Trigger{
 // WrongBotTrigger redirects to correct bot
 var WrongBotTrigger = hbot.Trigger{
 	func(bot *hbot.Bot, m *hbot.Message) bool {
-		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!")
+		re := regexp.MustCompile("^![^!\\?]+$")
+		return m.Command == "PRIVMSG" && re.MatchString(m.Content)
 	},
 	func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, "Tarkoititko ."+strings.TrimPrefix(m.Content, "!")+"?")
