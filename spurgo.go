@@ -39,7 +39,7 @@ func main() {
 	irc.AddTrigger(URLTrigger)
 	irc.AddTrigger(SimileTrigger)
 	// WrongBotTrigger needs to be last
-	irc.AddTrigger(WrongBotTrigger)
+	// irc.AddTrigger(WrongBotTrigger)
 	irc.Logger.SetHandler(log.StdoutHandler)
 
 	// Start up bot (this blocks until we disconnect)

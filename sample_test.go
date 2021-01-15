@@ -22,3 +22,8 @@ func TestSampleSearch(t *testing.T) {
 	t.Log(s)
 	s = sample("", "Vantaa") // vantaasta ei ole vertauskuvia
 }
+
+func TestInvalidFile(t *testing.T) {
+	s := sample("data/yolo.txt", "")
+	t.Log(s)
+}
