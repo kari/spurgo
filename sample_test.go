@@ -6,7 +6,7 @@ import (
 )
 
 func TestSample(t *testing.T) {
-	s := sample("", "")
+	s := sample("test/data.txt", "")
 	if s == "" {
 		t.Errorf("sample returned empty")
 	}
@@ -14,13 +14,13 @@ func TestSample(t *testing.T) {
 }
 
 func TestSampleSearch(t *testing.T) {
-	f := "lehmä"
-	s := sample("", f)
+	f := "akka"
+	s := sample("test/data.txt", f)
 	if !strings.Contains(strings.ToLower(s), f) {
 		t.Errorf("sample does not contain substring")
 	}
 	t.Log(s)
-	s = sample("", "Vantaa") // vantaasta ei ole vertauskuvia
+	s = sample("test/data.txt", "Vantaa") // vantaasta ei ole vertauskuvia
 }
 
 func TestInvalidFile(t *testing.T) {
