@@ -49,10 +49,10 @@ func main() {
 
 // SayInfoMessage replies Hello when you say !info
 var SayInfoMessage = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG" && m.Content == "!info"
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmt.Sprintf("Hei, olen %s. Kysy minulta vaikka säätä: !sää helsinki", irc.Nick))
 		return true
 	},
@@ -60,10 +60,10 @@ var SayInfoMessage = hbot.Trigger{
 
 // QuitTrigger makes the bot shut down
 var QuitTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG" && m.To == bot.Nick && m.Content == "!quit" && m.From == "zyx"
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Info("Quit trigger activated")
 		irc.Send("QUIT :Time to die.")
 
@@ -73,10 +73,10 @@ var QuitTrigger = hbot.Trigger{
 
 // OpTrigger makes the bot op the owner
 var OpTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG" && m.To == bot.Nick && strings.HasPrefix(m.Content, "!op ") && m.From == "zyx"
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.ChMode("zyx", strings.TrimPrefix(m.Content, "!op "), "+o")
 
 		return true
@@ -85,10 +85,10 @@ var OpTrigger = hbot.Trigger{
 
 // WeatherTrigger check weather
 var WeatherTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!sää ")
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!sää ")))
 		return true
 	},
@@ -96,10 +96,10 @@ var WeatherTrigger = hbot.Trigger{
 
 // WeatherTrigger2 check weather
 var WeatherTrigger2 = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!fmi ")
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!fmi ")))
 		return true
 	},
@@ -107,10 +107,10 @@ var WeatherTrigger2 = hbot.Trigger{
 
 // SimileTrigger fetches a simile
 var SimileTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
 		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!vertaus")
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, sample("", strings.TrimSpace(strings.TrimPrefix(m.Content, "!vertaus"))))
 		return true
 	},
@@ -118,11 +118,11 @@ var SimileTrigger = hbot.Trigger{
 
 // WrongBotTrigger redirects to correct bot
 var WrongBotTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
-		re := regexp.MustCompile("^![^!\\?]+$")
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
+		re := regexp.MustCompile(`^![^!\?]+$`)
 		return m.Command == "PRIVMSG" && re.MatchString(m.Content)
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		irc.Reply(m, "Tarkoititko ."+strings.TrimPrefix(m.Content, "!")+"?")
 		return true
 	},
@@ -130,12 +130,12 @@ var WrongBotTrigger = hbot.Trigger{
 
 // URLTrigger attempts to describe the link
 var URLTrigger = hbot.Trigger{
-	func(bot *hbot.Bot, m *hbot.Message) bool {
-		re := regexp.MustCompile("https?:\\/\\/[^\\ ]+")
+	Condition: func(bot *hbot.Bot, m *hbot.Message) bool {
+		re := regexp.MustCompile(`https?:\/\/[^\ ]+`)
 		return m.Command == "PRIVMSG" && re.MatchString(m.Content)
 	},
-	func(irc *hbot.Bot, m *hbot.Message) bool {
-		re := regexp.MustCompile("https?:\\/\\/[^\\ ]+")
+	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
+		re := regexp.MustCompile(`https?:\/\/[^\ ]+`)
 		irc.Reply(m, urldescribe.DescribeURL(re.FindString(m.Content)))
 		return true
 	},

@@ -13,7 +13,7 @@ import (
 // https://gregable.com/2007/10/reservoir-sampling.html
 func sample(filename string, search string) string {
 	if filename == "" {
-		filename = "data/vertauskuvat.txt"
+		filename = "data/vertauskuvat.txt" // FIXME: embed using go:embed
 	}
 	search = strings.ToLower(search)
 

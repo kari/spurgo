@@ -20,7 +20,7 @@ func TestSampleSearch(t *testing.T) {
 		t.Errorf("sample does not contain substring")
 	}
 	t.Log(s)
-	s = sample("test/data.txt", "Vantaa") // vantaasta ei ole vertauskuvia
+	_ = sample("test/data.txt", "Vantaa") // vantaasta ei ole vertauskuvia
 }
 
 func TestInvalidFile(t *testing.T) {
