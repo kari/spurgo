@@ -6,24 +6,36 @@ import (
 )
 
 func TestSample(t *testing.T) {
-	s := sample("test/data.txt", "")
-	if s == "" {
-		t.Errorf("sample returned empty")
+	s, err := Sample("test/data.txt", "")
+	if err != nil {
+		t.Errorf("got error: %s", err)
 	}
-	t.Log(s)
+	if s == "" {
+		t.Errorf("sample returned empty, expected any line")
+	}
 }
 
 func TestSampleSearch(t *testing.T) {
-	f := "akka"
-	s := sample("test/data.txt", f)
-	if !strings.Contains(strings.ToLower(s), f) {
+	s, err := Sample("test/data.txt", "akka")
+	if err != nil {
+		t.Errorf("got error: %s", err)
+	}
+	if !strings.Contains(strings.ToLower(s), "akka") {
 		t.Errorf("sample does not contain substring")
 	}
-	t.Log(s)
-	_ = sample("test/data.txt", "Vantaa") // vantaasta ei ole vertauskuvia
+
+	_, err = Sample("test/data.txt", "Vantaa") // vantaasta ei ole vertauskuvia
+	if err == nil {
+		t.Errorf("expected error")
+	}
+	if err.Error() != "no matching lines found" {
+		t.Errorf("expected 'no matching lines found', got %s", err)
+	}
 }
 
 func TestInvalidFile(t *testing.T) {
-	s := sample("data/yolo.txt", "")
-	t.Log(s)
+	_, err := Sample("data/yolo.txt", "")
+	if err == nil {
+		t.Errorf("err should be non-null")
+	}
 }

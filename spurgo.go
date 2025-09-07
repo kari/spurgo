@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"regexp"
@@ -89,7 +90,8 @@ var WeatherTrigger = hbot.Trigger{
 		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!sää ")
 	},
 	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
-		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!sää ")))
+		weather, _ := fmi.Weather(strings.TrimPrefix(m.Content, "!sää "))
+		irc.Reply(m, weather)
 		return true
 	},
 }
@@ -100,7 +102,8 @@ var WeatherTrigger2 = hbot.Trigger{
 		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!fmi ")
 	},
 	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
-		irc.Reply(m, fmi.Weather(strings.TrimPrefix(m.Content, "!fmi ")))
+		weather, _ := fmi.Weather(strings.TrimPrefix(m.Content, "!fmi "))
+		irc.Reply(m, weather)
 		return true
 	},
 }
@@ -111,7 +114,8 @@ var SimileTrigger = hbot.Trigger{
 		return m.Command == "PRIVMSG" && strings.HasPrefix(m.Content, "!vertaus")
 	},
 	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
-		irc.Reply(m, sample("", strings.TrimSpace(strings.TrimPrefix(m.Content, "!vertaus"))))
+		vertaus, _ := Sample("data/vertauskuvat.txt", strings.TrimSpace(strings.TrimPrefix(m.Content, "!vertaus")))
+		irc.Reply(m, vertaus)
 		return true
 	},
 }
@@ -136,7 +140,8 @@ var URLTrigger = hbot.Trigger{
 	},
 	Action: func(irc *hbot.Bot, m *hbot.Message) bool {
 		re := regexp.MustCompile(`https?:\/\/[^\ ]+`)
-		irc.Reply(m, urldescribe.DescribeURL(re.FindString(m.Content)))
+		desc, _ := urldescribe.DescribeURL(context.Background(), re.FindString(m.Content))
+		irc.Reply(m, desc)
 		return true
 	},
 }
