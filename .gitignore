@@ -1,4 +1,4 @@
-spurgo
-spurgo-*
 .vscode/
 data/
+dist/
+build/

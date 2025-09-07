@@ -1,15 +1,41 @@
-GOARCH = amd64 /* FIXME: ARM for Mac
-name = spurgo
-bins = $(name) $(name)-linux
+NAME ?= spurgo
+VERSION ?= $(shell git describe --tags --always --dirty)
+# Supported platforms for cross-compilation
+TARGETS ?= linux/amd64 darwin/arm64 windows/amd64
 
-all: $(bins)
+# Build flags
+LDFLAGS := -ldflags "-X main.Version=$(VERSION)"
+CMD_PATH := .
 
-$(name): spurgo.go
-	GOOS=darwin GOARCH=arm64 go build -o $@
+.PHONY: all clean test lint build dist dev
 
-$(name)-linux: spurgo.go
-	GOOS=linux GOARCH=amd64 go build -o $@
+all: test lint build
+
+lint:
+	go vet ./...
+
+test:
+	go test -v ./...
+
+build: clean
+	mkdir -p build/
+	go build -o build/$(NAME) $(LDFLAGS) $(CMD_PATH)
+
+dist: clean lint test
+	mkdir -p dist/
+	for target in $(TARGETS); do \
+		GOOS=$$(echo $$target | cut -d"/" -f1); \
+		GOARCH=$$(echo $$target | cut -d"/" -f2); \
+		EXT=""; \
+    if [ "$$GOOS" = "windows" ]; then EXT=".exe"; fi; \
+		GOOS=$$GOOS GOARCH=$$GOARCH go build -o dist/$(NAME)-$$GOOS-$$GOARCH$$EXT \
+    $(LDFLAGS) \
+    $(CMD_PATH); \
+	done
 
 clean:
+	rm -rf build/ dist/
 	go clean
-	rm -f $(bins)
+
+dev: build
+	./build/$(NAME)
