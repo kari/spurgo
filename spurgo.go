@@ -13,20 +13,28 @@ import (
 	log "gopkg.in/inconshreveable/log15.v2"
 )
 
+var Version = "development"
+
 var serv = flag.String("server", "irc.quakenet.org:6667", "hostname and port for irc server to connect to")
 var nick = flag.String("nick", "spurgo", "nickname for the bot")
 var chans = flag.String("chans", "#spurgo", "channels to join")
+var versionFlag = flag.Bool("version", false, "print version information and quit")
 
 func main() {
 	flag.Parse()
+
+	if *versionFlag {
+		fmt.Printf("Version: %s\n", Version)
+		return
+	}
 
 	hijackSession := func(bot *hbot.Bot) {
 		bot.HijackSession = true
 	}
 	channels := func(bot *hbot.Bot) {
 		bot.Channels = strings.Split(*chans, ",")
-
 	}
+
 	irc, err := hbot.NewBot(*serv, *nick, hijackSession, channels)
 	if err != nil {
 		panic(err)
