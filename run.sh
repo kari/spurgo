@@ -1,1 +1,0 @@
-nohup ./spurgo-linux -server chat.freenode.net:6667 -chans \#reddit-suomi > /dev/null 2>&1 &
