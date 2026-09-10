@@ -32,7 +32,7 @@ func Sample(filename string, search string) (string, error) {
 		line = scanner.Text()
 		if search == "" || strings.Contains(strings.ToLower(line), search) {
 			j := 1 + rand.IntN(i) // j = [1, i]
-			if j <= 1 {
+			if j == 1 {
 				result = line
 			}
 			i = i + 1
